@@ -5,10 +5,12 @@ import (
 	"net/http"
 	"os"
 
+	//"path/filepath"
+
 	"github.com/joho/godotenv"
 )
 
-const webDir = "/Users/alexeagle1535/Documents/github.com/AlexEagle1535/go_final_project-main/web"
+const webDir = "web"
 
 func init() {
 	if err := godotenv.Load(); err != nil {
@@ -23,6 +25,11 @@ func Run() {
 		os.Setenv("TODO_PORT", port)
 		fmt.Printf("Порт не найден, установлен порт по умолчанию: %s\n", port)
 	}
+	//absWebDir, err := filepath.Abs(webDir)
+	// if err != nil {
+	// 	fmt.Printf("ошибка получения абсолютного пути к директории: %s\n", err.Error())
+	// 	return
+	// }
 	http.Handle("/", http.FileServer(http.Dir(webDir)))
 	if err := http.ListenAndServe(":"+port, nil); err != nil {
 		fmt.Printf("ошибка запуска сервера: %s\n", err.Error())
