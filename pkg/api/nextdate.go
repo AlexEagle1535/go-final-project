@@ -8,8 +8,6 @@ import (
 	"time"
 )
 
-const Tformat = "20060102"
-
 func nextDateHandler(w http.ResponseWriter, r *http.Request) {
 	now := r.URL.Query().Get("now")
 	date := r.URL.Query().Get("date")
@@ -107,7 +105,6 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 		dayFlags := [32]bool{}
 		monthFlags := [13]bool{}
 		var last, prelast, backLast, backPrelast bool
-		// Заполняем допустимые дни
 		daysPart := strings.Split(repeatSplit[1], ",")
 		for _, d := range daysPart {
 			dayNum, err := strconv.Atoi(d)
@@ -123,8 +120,6 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 				dayFlags[dayNum] = true
 			}
 		}
-
-		// Заполняем допустимые месяцы
 		if len(repeatSplit) >= 3 {
 			monthsPart := strings.Split(repeatSplit[2], ",")
 			for _, m := range monthsPart {
@@ -145,7 +140,6 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 			lastDay := lastDayOfMonth(date)
 			monthInt := int(month)
 			if !monthFlags[monthInt] {
-				// Месяц не разрешён — переходим к следующему месяцу
 				date = time.Date(year, month+1, 1, 0, 0, 0, 0, time.UTC)
 				continue
 			}
@@ -157,13 +151,8 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 				dayFlags[lastDay-1] = true
 				backPrelast = true
 			}
-			// Ищем день в месяце
 			for day := 1; day <= lastDay; day++ {
 				if !dayFlags[day] {
-					continue
-				}
-				if day > lastDay {
-					// В месяце нет такого дня (например, 31-го)
 					continue
 				}
 				candidate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
@@ -179,7 +168,6 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 				dayFlags[lastDay-1] = false
 				backPrelast = false
 			}
-			// Ничего не подошло — переход на следующий месяц
 			date = time.Date(year, month+1, 1, 0, 0, 0, 0, time.UTC)
 		}
 	default:
