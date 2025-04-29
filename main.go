@@ -10,6 +10,8 @@ import (
 	"github.com/joho/godotenv"
 )
 
+const Tformat = "20060102"
+
 func init() {
 	if err := godotenv.Load(); err != nil {
 		fmt.Print("No .env file found")
