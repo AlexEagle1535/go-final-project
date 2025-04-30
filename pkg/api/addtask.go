@@ -20,7 +20,7 @@ func writeJSON(w http.ResponseWriter, statusCode int, data any) {
 
 func checkDate(task *db.Task) error {
 	now := time.Now()
-
+	now = time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
 	if task.Date == "" {
 		task.Date = now.Format(Tformat)
 	}

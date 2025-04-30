@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 	"strings"
 	"time"
 )
@@ -64,4 +65,65 @@ func Tasks(limit int, search string) ([]*Task, error) {
 		tasks = []*Task{}
 	}
 	return tasks, nil
+}
+
+func GetTask(id string) (*Task, error) {
+	var task Task
+	query := `SELECT id, date, title, comment, repeat FROM scheduler WHERE id = ?`
+	err := DB.QueryRow(query, id).Scan(&task.ID, &task.Date, &task.Title, &task.Comment, &task.Repeat)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &task, nil
+}
+
+func UpdateTask(task *Task) error {
+	query := `UPDATE scheduler SET date = ?, title = ?, comment = ?, repeat = ? WHERE id = ?`
+	res, err := DB.Exec(query, task.Date, task.Title, task.Comment, task.Repeat, task.ID)
+	if err != nil {
+		return err
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return fmt.Errorf(`incorrect id for updating task`)
+	}
+	return nil
+}
+
+func DeleteTask(id string) error {
+	query := `DELETE FROM scheduler WHERE id = ?`
+	res, err := DB.Exec(query, id)
+	if err != nil {
+		return err
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return fmt.Errorf(`incorrect id for deleting task`)
+	}
+	return nil
+}
+
+func UpdateDate(id string, date string) error {
+	query := `UPDATE scheduler SET date = ? WHERE id = ?`
+	res, err := DB.Exec(query, date, id)
+	if err != nil {
+		return err
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return fmt.Errorf(`incorrect id for updating task`)
+	}
+	return nil
 }
